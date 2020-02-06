@@ -24,7 +24,7 @@ def get_papers_by_keyword(keywords, offset=0, limit = 20, custom_params=None,
     # check if there is an outbound network first
     keywords = " OR ".join(keywords.split(","))
     data = {
-        "query": f"{keywords} AND OPEN_ACCESS:{o_access}",
+        "query": "{} AND OPEN_ACCESS:{}".format(keywords, o_access),
         "resultType": "lite", "synonymn": "",
         "cursorMark": "*",
         "pageSize": "1000",  # valid page size 1-1000 only
@@ -33,7 +33,7 @@ def get_papers_by_keyword(keywords, offset=0, limit = 20, custom_params=None,
     }
     data = custom_params if custom_params else data
     response = _request_all_results(data)
-    response = {f"{pub['id']}": pub for pub in response}
+    response = {"{}".format(pub['id']): pub for pub in response}
     return response
 
 def _request_query(data, cursor_mark='%2A'):
@@ -61,7 +61,7 @@ def _request_all_results(data, verbose=False):
                 done = cursor_mark == page_result['nextCursorMark']
                 cursor_mark = page_result['nextCursorMark']
                 data["cursorMark"]= page_result['nextCursorMark']
-                print(f"No. results: {len(results)}")
+                print("No. results: {}".format(len(results)))
         except Exception as e:
             time.sleep(150)
             print("wait, ")
@@ -94,7 +94,7 @@ def to_file(results, outf_name="records", format="txt"):
             "title", "journalTitle",
             "pubYear", "journalVolume",
             "pageInfo", "doi"]
-    outf_name = f"{outf_name}.{format}"
+    outf_name = "{}.{}".format(outf_name, format)
     with open(outf_name, "a", encoding="utf-8") as outf:
         if format != "txt":
             print(results, file=outf)
@@ -109,5 +109,5 @@ def to_file(results, outf_name="records", format="txt"):
                 except KeyError:
                     ret_infos.append("")
             print(";".join(ret_infos), file=outf)
-    print(f"Output written in {outf_name}")
+    print("Output written in {}".format(outf_name))
 
