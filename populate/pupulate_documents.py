@@ -111,8 +111,7 @@ if __name__ == "__main__":
                                                                 pub['id'].replace('PMC','')),
                                                source=None)
 
-            if not('pmcid' in pub) or not('annotations' in pub)
-                or not(pub['annotations']) : break
+            if not('pmcid' in pub) or not('annotations' in pub) or not(pub['annotations']) : break
 
             pub['fulltext'] = get_article(pub['pmcid'], annotations=pub['annotations'])
             pub['labels'], pub['sentences'] = process_input(pub['fulltext'], pub['annotations'])
