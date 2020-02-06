@@ -86,7 +86,7 @@ if __name__ == "__main__":
     list = ["diabetes", "dengue", "chikungunya", "aedes aegypti", "coronavirus",
      "Infection","Medulloblastoma","Antibody","Cells","Inhale"]
     for kwd in list:
-        keywords = f'({kwd} AND ' \
+        keywords = '({} AND '.format(kwd) \
                    '(FIRST_PDATE:[2000-01-01 TO 2020-03-31])) AND OPEN_ACCESS:Y'
 
         client = MongoClient()
