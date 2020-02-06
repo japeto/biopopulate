@@ -83,9 +83,11 @@ def get_entites(sentence: str) -> str:
     return ""
 
 if __name__ == "__main__":
+    import time
+
     lst_diseases = ["diabetes", "dengue", "chikungunya", "aedes aegypti", "coronavirus",
      "Infection","Medulloblastoma","Antibody","Cells","Inhale"]
-    for kwd in lst_diseases[1]:
+    for kwd in lst_diseases:
         keywords = '({} AND (FIRST_PDATE:[2019-01-01 TO 2020-03-31])) ' \
                    'AND OPEN_ACCESS:Y'.format(kwd)
 
@@ -109,7 +111,8 @@ if __name__ == "__main__":
                                                                 pub['id'].replace('PMC','')),
                                                source=None)
 
-            if not('pmcid' in pub): break
+            if not('pmcid' in pub) or not('annotations' in pub)
+                or not(pub['annotations']) : break
 
             pub['fulltext'] = get_article(pub['pmcid'], annotations=pub['annotations'])
             pub['labels'], pub['sentences'] = process_input(pub['fulltext'], pub['annotations'])
@@ -130,5 +133,7 @@ if __name__ == "__main__":
             {"_id": user_id},
             {"$inc": {"nsearch": 1}},
             upsert=False)
+
+        time.sleep(400)
 
 
