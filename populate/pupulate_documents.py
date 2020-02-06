@@ -31,7 +31,7 @@ def process_input(raw_text="", entities=None):
         cmbs = cmbs+list(itertools.combinations(inter, 2))
         for tupl in cmbs:
             tupl= "{}\t{}\t".format(tupl[0],tupl[1])
-            sentence.append(f'{tupl}{sent}')
+            sentence.append("{}{}".format(tupl, sent))
             # print(f'{tupl}{sent}')
     return [], sentence
 
