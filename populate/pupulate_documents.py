@@ -83,10 +83,10 @@ def get_entites(sentence: str) -> str:
     return ""
 
 if __name__ == "__main__":
-    list = ["diabetes", "dengue", "chikungunya", "aedes aegypti", "coronavirus",
+    lst_diseases = ["diabetes", "dengue", "chikungunya", "aedes aegypti", "coronavirus",
      "Infection","Medulloblastoma","Antibody","Cells","Inhale"]
-    for kwd in list:
-        keywords = '({} AND (FIRST_PDATE:[2000-01-01 TO 2020-03-31])) ' \
+    for kwd in lst_diseases[1]:
+        keywords = '({} AND (FIRST_PDATE:[2019-01-01 TO 2020-03-31])) ' \
                    'AND OPEN_ACCESS:Y'.format(kwd)
 
         client = MongoClient()
@@ -96,7 +96,7 @@ if __name__ == "__main__":
         outf_name = keywords.lower().strip().replace(",","_")+".json"
         results = get_papers_by_keyword(keywords=keywords)
         results
-        ids=list(results)[0:200]
+        ids=[id for id in results][0:200]
         user_id = db.user.find_one(
             {"username": "'bioworkbench'"},
             {"_id": 1})["_id"]
