@@ -40,7 +40,8 @@ def get_annotations(identifier, annotation="disease", source="PMC"):
                 try:
                     None if val in annotations[key] else annotations[key].append( val )
                 except Exception as exp:
-                    annotations[key]:[val]
+                    # annotations[key]:[val]
+                    None
             return annotations
     except:
         pass
