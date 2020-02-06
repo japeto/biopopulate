@@ -105,7 +105,9 @@ if __name__ == "__main__":
 
         for key in ids:
             pub=results[key]
-            pub['annotations']=get_annotations(f"{pub['source']}%3A{pub['id'].replace('PMC','')}", source=None)
+            pub['annotations']=get_annotations("{}%3A{}".format(pub['source'],
+                                                                pub['id'].replace('PMC','')),
+                                               source=None)
 
             if not('pmcid' in pub): break
 
