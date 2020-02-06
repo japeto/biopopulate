@@ -16,11 +16,13 @@ annotations_url = "https://www.ebi.ac.uk/europepmc/annotations_api/annotationsBy
 
 def get_annotations(identifier, annotation="disease", source="PMC"):
     try:
-     with requests.get(f"{annotations_url}articleIds="
-                       f"{identifier}&type={annotation}&format=JSON") as annotations:
+     with requests.get("{}articleIds={}&type={}&format=JSON"
+                               .format(annotations_url, identifier, annotation)) as annotations:
         if source:
-            annotations = requests.get(f"{annotations_url}articleIds="
-                                       f"{source}%3A{identifier}&type={annotation}&format=JSON")
+            annotations = requests.get("{}articleIds="
+                                       "{}%3A{identifier}&type={}&format=JSON"
+                                       .format(annotations_url,source,annotation)
+                                       )
         if annotations.status_code == 200:
             try:
                 response = json.loads(annotations.text)
@@ -45,7 +47,8 @@ def get_annotations(identifier, annotation="disease", source="PMC"):
 
 def get_article(identifier, annotations=None) -> dict:
     try:
-        with requests.get(f"{base_url}rest/{identifier}/fullTextXML") as response:
+        with requests.get("{}rest/{}/fullTextXML"
+                                  .format(base_url, identifier)) as response:
             full_xml = response.text
             article = {}
             try:
@@ -78,9 +81,9 @@ def _iterate_get_text(elem):
     s = ''
     if elem.tag not in remove_tags:
         if elem.tag in line_break_tags and not (elem.text is None):
-            s += f"\n{elem.text.strip()}\n" if not(elem.text is None) else ''
+            s += "\n{}\n".format(elem.text.strip()) if not(elem.text is None) else ''
         else:
-            s += f"{elem.text.strip()} " if not (elem.text is None) else ''
+            s += "{} ".format(elem.text.strip()) if not (elem.text is None) else ''
         for e in list(elem):
             ct = _iterate_get_text(e)
             s += (' ' + ct) if len(ct) > 0 else ''
@@ -93,5 +96,5 @@ def _merge_textannotations(annotations=None, article=None) -> str:
     tagged = article["body"].replace("\n", "<br/>") # remove jumps
     for key in annotations:
         for word in annotations[key]:
-            tagged = re.sub(r'\b{}\b'.format(word), f"<{key}>{word}</{key}>", tagged)
+            tagged = re.sub(r'\b{}\b'.format(word), "<{}>{}</{}>".format(key,word,key), tagged)
     return tagged
