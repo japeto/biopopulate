@@ -61,6 +61,7 @@ def _request_all_results(data, verbose=False):
                 done = cursor_mark == page_result['nextCursorMark']
                 cursor_mark = page_result['nextCursorMark']
                 data["cursorMark"]= page_result['nextCursorMark']
+                if len(results) > 100000: done= True
                 print("No. results: {}".format(len(results)))
         except Exception as e:
             time.sleep(150)
