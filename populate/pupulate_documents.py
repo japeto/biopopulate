@@ -96,7 +96,7 @@ if __name__ == "__main__":
         outf_name = keywords.lower().strip().replace(",","_")+".json"
         results = get_papers_by_keyword(keywords=keywords)
         results
-        ids=[id for id in results][0:500]
+        ids=[id for id in results][0:1000]
         user_id = db.user.find_one(
             {"username": "'bioworkbench'"},
             {"_id": 1})["_id"]
