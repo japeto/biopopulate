@@ -83,48 +83,50 @@ def get_entites(sentence: str) -> str:
     return ""
 
 if __name__ == "__main__":
-    keywords = '(("rice") AND ' \
-               '(FIRST_PDATE:[2000-01-01 TO 2020-03-31])) AND OPEN_ACCESS:Y'
+    list = ["diabetes", "dengue", "chikungunya", "aedes aegypti", "coronavirus",
+     "Infection","Medulloblastoma","Antibody","Cells","Inhale"]
+    for kwd in list:
+        keywords = f'({kwd} AND ' \
+                   '(FIRST_PDATE:[2000-01-01 TO 2020-03-31])) AND OPEN_ACCESS:Y'
 
-    client = MongoClient()
-    db=client.biomedicalrelation
-    documents= db.documents
+        client = MongoClient()
+        db=client.biomedicalrelation
+        documents= db.documents
 
-    outf_name = keywords.lower().strip().replace(",","_")+".json"
-    results = get_papers_by_keyword(keywords=keywords)
-    results
-    ids=list(results)[0:5]
-    user_id = db.user.find_one(
-        {"username": "'bioworkbench'"},
-        {"_id": 1})["_id"]
+        outf_name = keywords.lower().strip().replace(",","_")+".json"
+        results = get_papers_by_keyword(keywords=keywords)
+        results
+        ids=list(results)[0:200]
+        user_id = db.user.find_one(
+            {"username": "'bioworkbench'"},
+            {"_id": 1})["_id"]
 
-    # documents.delete_many({})
-    now=time.strftime('%Y-%m-%d')
+        now=time.strftime('%Y-%m-%d')
 
-    for key in ids:
-        pub=results[key]
-        pub['annotations']=get_annotations(f"{pub['source']}%3A{pub['id'].replace('PMC','')}", source=None)
+        for key in ids:
+            pub=results[key]
+            pub['annotations']=get_annotations(f"{pub['source']}%3A{pub['id'].replace('PMC','')}", source=None)
 
-        if not('pmcid' in pub): break
+            if not('pmcid' in pub): break
 
-        pub['fulltext'] = get_article(pub['pmcid'], annotations=pub['annotations'])
-        pub['labels'], pub['sentences'] = process_input(pub['fulltext'], pub['annotations'])
-        pub['userid'] = user_id
-        pub['stated'] = "unprocessed"
-        pub['download_date'] = now
-        pub['processed_date'] = None
-        pub['marked'] = ""
-        if pub['fulltext']:
-            for snt in sent_tokenize(pub['fulltext']['tagged']):
-                pub['marked'] = pub['marked'] + get_entites(snt)
-        # aplicar modelo
-        results[key] = pub
+            pub['fulltext'] = get_article(pub['pmcid'], annotations=pub['annotations'])
+            pub['labels'], pub['sentences'] = process_input(pub['fulltext'], pub['annotations'])
+            pub['userid'] = user_id
+            pub['stated'] = "unprocessed"
+            pub['download_date'] = now
+            pub['processed_date'] = None
+            pub['marked'] = ""
+            if pub['fulltext']:
+                for snt in sent_tokenize(pub['fulltext']['tagged']):
+                    pub['marked'] = pub['marked'] + get_entites(snt)
+            # aplicar modelo
+            results[key] = pub
 
-    dump = [results[pub] for pub in results if pub in ids ]
-    [documents.insert(doc) for doc in dump]
-    db.user.update_one(
-        {"_id": user_id},
-        {"$inc": {"nsearch": 1}},
-        upsert=False)
+        dump = [results[pub] for pub in results if pub in ids ]
+        [documents.insert(doc) for doc in dump]
+        db.user.update_one(
+            {"_id": user_id},
+            {"$inc": {"nsearch": 1}},
+            upsert=False)
 
 
